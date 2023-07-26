@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=chrome">
+    <title>Nutriscore</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="nutriscore.js"></script>
+</head>
+<body>
+<nav class="no-print navbar navbar-expand-lg navbar-transparent navbar-absolute container">
+    <div class="container-fluid">
+        <div class="navbar-wrapper">
+            <img style="width: 100px;" src="assets/nutriscore.png" alt="Nutriscore"/>
+            <a class="navbar-brand" href="#">Nutriscore Rechner</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card mt-5 p-3">
+        <div class="card-body">
+            <h3>Berechnen Sie den Nutri-Score aus Nährwertangaben Ihrer Lebensmittel selbst:</h3>
+
+            <div id="nutriscoreform">
+                <div class="row">
+                    <div class="col-3">
+                        Produktkategorie:
+                    </div>
+                    <div class="col-9">
+                        <select id="product_class">
+                            <option value="general">Allgemein</option>
+                            <option value="cheese">Käse</option>
+                            <option value="water">Wasser</option>
+                            <option value="beverage">Getränke</option>
+                            <option value="fats">Fette, Öle, Butter, Sahne</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Energie in kJ:
+                    </div>
+                    <div class="col-9">
+                        <input id="engergy_kj" type="number"/> kJ/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Fett (gesamt):
+                    </div>
+                    <div class="col-9">
+                        <input id="fat" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        gesättigte Fettsäuren:
+                    </div>
+                    <div class="col-9">
+                        <input id="saturated_fat" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Zucker:
+                    </div>
+                    <div class="col-9">
+                        <input id="sugar" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Eiweiß:
+                    </div>
+                    <div class="col-9">
+                        <input id="protein" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Ballaststoffe:
+                    </div>
+                    <div class="col-9">
+                        <input id="fiber" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Salz:
+                    </div>
+                    <div class="col-9">
+                        <input id="salt" type="number"/> g/100g
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3">
+                        Früchte, Gemüse, Nüsse sowie Raps-, Walnuss- und Olivenöl:
+                    </div>
+                    <div class="col-9">
+                        <input id="fruitsVegetablesNuts" type="number"/> %
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-2">
+                        <button id="calculate" class="btn btn-primary" onclick="onCalc()">Berechnen</button>
+                    </div>
+                    <div class="col-10">
+                        <button id="reset" class="btn btn-secondary" onclick="reset()">Zurücksetzen</button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="nutriscore">
+                            <img id="nutriscoreImage" src="assets/nutriscore.png" alt="Nutriscore" width="200px"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function onCalc() {
+        const productClass = document.getElementById('product_class').value;
+        console.log("productClass: " + productClass);
+        const energy_kj = document.getElementById('engergy_kj').value.replace(',', '.');
+        const fat = document.getElementById('fat').value.replace(',', '.'); // Fett pro in g pro 100g
+        const saturatedFat = document.getElementById('saturated_fat').value.replace(',', '.'); // Gesättigte Fettsäuren in g pro 100g
+        const sugar = document.getElementById('sugar').value.replace(',', '.'); // Zucker in g pro 100g
+        const sodium = document.getElementById('salt').value.replace(',', '.'); // Salz in g pro 100g
+        const fiber = document.getElementById('fiber').value.replace(',', '.'); // Ballaststoffe in g pro 100g (wenn nicht vorhanden, setzen wir 0)
+        const proteins = document.getElementById('protein').value.replace(',', '.'); // Proteine in g pro 100g
+        const fruitsVegetablesNuts = document.getElementById('fruitsVegetablesNuts').value.replace(',', '.'); // Obst, Gemüse, Hülsenfrüchte, Nüsse, Ölsaaten in g pro 100g (wenn nicht vorhanden, setzen wir 0)
+
+        const nutriScore = calculateNutriScore(energy_kj, sugar, fat, saturatedFat, sodium, proteins, fiber, fruitsVegetablesNuts, productClass);
+
+        document.getElementById('nutriscoreImage').src = 'assets/nutriscore' + nutriScore + '.png';
+
+    }
+
+    function reset() {
+        document.getElementById('product_class').value = 'general'
+        document.getElementById('engergy_kj').value = ''
+        document.getElementById('fat').value = ''
+        document.getElementById('saturated_fat').value = ''
+        document.getElementById('sugar').value = ''
+        document.getElementById('salt').value = ''
+        document.getElementById('fiber').value = ''
+        document.getElementById('protein').value = ''
+        document.getElementById('fruitsVegetablesNuts').value = ''
+
+    }
+</script>
+
+</body>
+</html>
